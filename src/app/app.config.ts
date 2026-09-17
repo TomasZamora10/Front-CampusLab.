@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
@@ -15,7 +15,11 @@ export function MSALInstanceFactory(): IPublicClientApplication {
     auth: {
       clientId: environment.msalConfig.auth.clientId,
       authority: environment.msalConfig.auth.authority,
-      redirectUri: environment.msalConfig.auth.redirectUri
+      // Se calcula en runtime (no viene de environment) para que la misma
+      // imagen Docker sirva en localhost, en la IP de EC2 o en un dominio
+      // futuro sin reconstruirla. Debe coincidir exactamente con una de las
+      // "Redirect URIs" permitidas en el App Registration de Azure AD.
+      redirectUri: window.location.origin
     }
   });
 }
@@ -42,6 +46,13 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
+    // msal-browser >= 3 exige inicializar la PublicClientApplication antes de
+    // usar cualquier API de MSAL (login, adquisicion de tokens, etc.); sin
+    // esto, loginRedirect() falla con "uninitialized_public_client_application".
+    provideAppInitializer(() => {
+      const msalService = inject(MsalService);
+      return msalService.instance.initialize();
+    }),
     { provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor, multi: true },
     { provide: MSAL_INSTANCE, useFactory: MSALInstanceFactory },
     { provide: MSAL_GUARD_CONFIG, useFactory: MSALGuardConfigFactory },
