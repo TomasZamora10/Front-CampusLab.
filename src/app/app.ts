@@ -1,27 +1,19 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { MsalBroadcastService, MsalService } from '@azure/msal-angular';
-import { InteractionStatus } from '@azure/msal-browser';
-import { filter } from 'rxjs/operators';
-import { AdminPingService } from './core/services/admin-ping.service';
+import { MsalService } from '@azure/msal-angular';
+import { AuthService } from './core/services/auth.service';
+import { Navbar } from './components/navbar/navbar';
 
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, Navbar],
   selector: 'app-root',
   styleUrl: './app.scss',
   templateUrl: './app.html',
 })
 export class App implements OnInit {
-  protected readonly title = signal('frontend-campuslab');
-  protected readonly isLoggedIn = signal(false);
-  protected readonly pingResult = signal<string | null>(null);
-  // Roles del App Registration de Azure AD, leidos del claim "roles" del ID
-  // token (Admin / Tecnico / Estudiante / Auditor segun el caso CampusLab).
-  protected readonly roles = signal<string[]>([]);
+  protected readonly auth = inject(AuthService);
 
   private readonly msalService = inject(MsalService);
-  private readonly msalBroadcastService = inject(MsalBroadcastService);
-  private readonly adminPingService = inject(AdminPingService);
   private readonly router = inject(Router);
 
   constructor() {
@@ -46,51 +38,6 @@ export class App implements OnInit {
   }
 
   ngOnInit(): void {
-    this.msalBroadcastService.inProgress$
-      .pipe(filter((status) => status === InteractionStatus.None))
-      .subscribe(() => {
-        const accounts = this.msalService.instance.getAllAccounts();
-        this.isLoggedIn.set(accounts.length > 0);
-
-        // Al recargar la pagina (sin pasar por el redirect de login) no hay
-        // cuenta activa todavia: sin fijarla aqui, MsalInterceptor no puede
-        // adquirir el token en silencio para las llamadas al BFF.
-        if (accounts.length > 0 && !this.msalService.instance.getActiveAccount()) {
-          this.msalService.instance.setActiveAccount(accounts[0]);
-        }
-
-        this.roles.set(this.leerRolesDeLaCuentaActiva());
-      });
-  }
-
-  /**
-   * App Roles configurados en el App Registration de Azure AD: llegan en el
-   * claim "roles" del ID token de la cuenta activa (mismo claim que valida
-   * el BFF en el access token). Si no hay cuenta o el claim no viene, se
-   * devuelve un arreglo vacio en vez de fallar.
-   */
-  private leerRolesDeLaCuentaActiva(): string[] {
-    const cuenta = this.msalService.instance.getActiveAccount()
-      ?? this.msalService.instance.getAllAccounts()[0];
-    const roles = cuenta?.idTokenClaims?.['roles'];
-    return Array.isArray(roles) ? (roles as string[]) : [];
-  }
-
-  logout(): void {
-    this.msalService.logoutRedirect();
-  }
-
-  probarAdminPing(): void {
-    this.pingResult.set(null);
-    this.adminPingService.ping().subscribe({
-      next: (respuesta) => {
-        console.log('Respuesta de /api/admin/ping:', respuesta);
-        this.pingResult.set(JSON.stringify(respuesta));
-      },
-      error: (error) => {
-        console.error('Error llamando a /api/admin/ping:', error);
-        this.pingResult.set(`Error ${error.status ?? ''}: ${error.message ?? error}`);
-      },
-    });
+    this.auth.inicializar();
   }
 }

@@ -1,1 +1,33 @@
-<p>navbar works!</p>
+@if (auth.isLoggedIn()) {
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+    <a class="navbar-brand" routerLink="/dashboard">CampusLab</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/catalog" routerLinkActive="active">Catálogo</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/bookings" routerLinkActive="active">Reservas</a>
+        </li>
+        @if (auth.tieneAlgunRol('ADMIN', 'AUDITOR')) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/reports" routerLinkActive="active">Reportes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/audit" routerLinkActive="active">Auditoría</a>
+          </li>
+        }
+      </ul>
+      <span class="navbar-text text-light me-3">
+        {{ auth.nombreUsuario() }}
+        @if (auth.roles().length) {
+          <span class="badge text-bg-secondary ms-2">{{ auth.roles().join(', ') }}</span>
+        }
+      </span>
+      <button class="btn btn-outline-light btn-sm" (click)="auth.logout()">Cerrar sesión</button>
+    </div>
+  </nav>
+}

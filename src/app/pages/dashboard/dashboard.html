@@ -1,1 +1,74 @@
-<p>dashboard works!</p>
+<h1 class="h3 mb-3">Bienvenido{{ auth.nombreUsuario() ? ', ' + auth.nombreUsuario() : '' }}</h1>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Catálogo</h5>
+        <p class="card-text text-muted">Laboratorios, equipos e insumos disponibles.</p>
+        <a routerLink="/catalog" class="btn btn-primary btn-sm">Ver catálogo</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Reservas</h5>
+        <p class="card-text text-muted">Solicita o gestiona reservas de laboratorios/equipos.</p>
+        <a routerLink="/bookings" class="btn btn-primary btn-sm">Ver reservas</a>
+      </div>
+    </div>
+  </div>
+  @if (auth.tieneAlgunRol('ADMIN', 'AUDITOR')) {
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Auditoría</h5>
+          <p class="card-text text-muted">Timeline completo de eventos del sistema.</p>
+          <a routerLink="/audit" class="btn btn-primary btn-sm">Ver auditoría</a>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+@if (auth.tieneAlgunRol('ADMIN', 'AUDITOR')) {
+  <h2 class="h4 mb-3">Resumen</h2>
+  @if (cargandoKpis()) {
+    <p class="text-muted">Cargando KPIs...</p>
+  } @else if (kpis()) {
+    <div class="row g-3">
+      <div class="col-md-3 col-6">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="fs-3 fw-bold">{{ kpis()!.totalReservas }}</div>
+            <div class="text-muted small">Reservas totales</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="fs-3 fw-bold">{{ (kpis()!.tasaAprobacion * 100) | number: '1.0-0' }}%</div>
+            <div class="text-muted small">Tasa de aprobación</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="fs-3 fw-bold">{{ (kpis()!.tasaCancelacion * 100) | number: '1.0-0' }}%</div>
+            <div class="text-muted small">Tasa de cancelación</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <a routerLink="/reports" class="btn btn-outline-secondary w-100 h-100 d-flex align-items-center justify-content-center">
+          Ver reporte completo
+        </a>
+      </div>
+    </div>
+  } @else {
+    <p class="text-muted">No fue posible cargar los KPIs.</p>
+  }
+}

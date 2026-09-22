@@ -1,1 +1,68 @@
-<p>reports works!</p>
+<h1 class="h3 mb-3">Reportes</h1>
+
+@if (error()) {
+  <div class="alert alert-danger">{{ error() }}</div>
+}
+
+@if (cargando()) {
+  <p class="text-muted">Cargando...</p>
+} @else if (kpis()) {
+  <div class="row g-3 mb-4">
+    <div class="col-md-3 col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <div class="fs-3 fw-bold">{{ kpis()!.totalReservas }}</div>
+          <div class="text-muted small">Reservas totales</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <div class="fs-3 fw-bold">{{ (kpis()!.tasaAprobacion * 100) | number: '1.0-0' }}%</div>
+          <div class="text-muted small">Tasa de aprobación</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <div class="fs-3 fw-bold">{{ (kpis()!.tasaCancelacion * 100) | number: '1.0-0' }}%</div>
+          <div class="text-muted small">Tasa de cancelación</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <h2 class="h5">Reservas por estado</h2>
+      <table class="table table-sm">
+        <tbody>
+          @for (fila of kpis()!.porEstado | keyvalue; track fila.key) {
+            <tr>
+              <td>{{ fila.key }}</td>
+              <td class="text-end fw-bold">{{ fila.value }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-md-6">
+      <h2 class="h5">Recursos más reservados</h2>
+      <table class="table table-sm">
+        <tbody>
+          @for (fila of topResources(); track fila.recursoId) {
+            <tr>
+              <td>{{ nombreRecurso(fila.recursoId) }}</td>
+              <td class="text-end fw-bold">{{ fila.cantidadReservas }}</td>
+            </tr>
+          } @empty {
+            <tr><td class="text-muted">Sin datos todavía.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

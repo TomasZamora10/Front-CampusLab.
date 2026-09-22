@@ -1,16 +1,4 @@
-<router-outlet />
-
-@if (isLoggedIn()) {
-  <div style="padding: 1rem; border-top: 1px solid #ddd; margin-top: 1rem;">
-    <p>
-      Roles: {{ roles().length ? roles().join(', ') : '(sin roles asignados en Azure AD)' }}
-      <button (click)="logout()" style="margin-left: 1rem;">Cerrar sesión</button>
-    </p>
-
-    <h2>Prueba E2E: BFF /api/admin/ping</h2>
-    <button (click)="probarAdminPing()">Probar /api/admin/ping</button>
-    @if (pingResult()) {
-      <pre>{{ pingResult() }}</pre>
-    }
-  </div>
-}
+<app-navbar />
+<main class="container-fluid py-3">
+  <router-outlet />
+</main>
