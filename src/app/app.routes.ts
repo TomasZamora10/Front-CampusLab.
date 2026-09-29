@@ -16,7 +16,7 @@ export const routes: Routes = [
   {
     path: 'reports',
     component: Reports,
-    canActivate: [MsalGuard, rolGuard(['ADMIN', 'AUDITOR'])],
+    canActivate: [MsalGuard, rolGuard(['ADMIN'])],
   },
   {
     path: 'audit',

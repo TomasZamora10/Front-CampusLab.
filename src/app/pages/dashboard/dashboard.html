@@ -32,7 +32,7 @@
   }
 </div>
 
-@if (auth.tieneAlgunRol('ADMIN', 'AUDITOR')) {
+@if (auth.tieneAlgunRol('ADMIN')) {
   <h2 class="h4 mb-3">Resumen</h2>
   @if (cargandoKpis()) {
     <p class="text-muted">Cargando KPIs...</p>

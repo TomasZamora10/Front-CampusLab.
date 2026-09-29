@@ -12,10 +12,12 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="/bookings" routerLinkActive="active">Reservas</a>
         </li>
-        @if (auth.tieneAlgunRol('ADMIN', 'AUDITOR')) {
+        @if (auth.tieneAlgunRol('ADMIN')) {
           <li class="nav-item">
             <a class="nav-link" routerLink="/reports" routerLinkActive="active">Reportes</a>
           </li>
+        }
+        @if (auth.tieneAlgunRol('ADMIN', 'AUDITOR')) {
           <li class="nav-item">
             <a class="nav-link" routerLink="/audit" routerLinkActive="active">Auditoría</a>
           </li>

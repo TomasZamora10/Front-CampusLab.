@@ -3,15 +3,18 @@ import { Observable } from 'rxjs';
 import { Api } from './api';
 import { Kpis, TopResource } from '../models/campuslab.models';
 
+/** Formato que espera el backend: last{N}h o last{N}d (ej. last24h, last7d). */
+export type Rango = 'last24h' | 'last7d' | 'last30d';
+
 @Injectable({ providedIn: 'root' })
 export class ReportService {
   private readonly api = inject(Api);
 
-  kpis(): Observable<Kpis> {
-    return this.api.get<Kpis>('/report/kpis');
+  kpis(range?: Rango): Observable<Kpis> {
+    return this.api.get<Kpis>('/report/kpis', { range });
   }
 
-  topResources(limit = 10): Observable<TopResource[]> {
-    return this.api.get<TopResource[]>('/report/top-resources', { limit });
+  topResources(range?: Rango, limit = 10): Observable<TopResource[]> {
+    return this.api.get<TopResource[]>('/report/top-resources', { range, limit });
   }
 }

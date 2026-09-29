@@ -1,5 +1,13 @@
 <h1 class="h3 mb-3">Reportes</h1>
 
+<div class="mb-3">
+  <select class="form-select form-select-sm w-auto" [ngModel]="rango()" (ngModelChange)="cambiarRango($event)">
+    <option value="last24h">Últimas 24 horas</option>
+    <option value="last7d">Últimos 7 días</option>
+    <option value="last30d">Últimos 30 días</option>
+  </select>
+</div>
+
 @if (error()) {
   <div class="alert alert-danger">{{ error() }}</div>
 }

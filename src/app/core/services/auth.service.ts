@@ -8,7 +8,7 @@ import { filter } from 'rxjs/operators';
  * Deben coincidir exactamente con los App Roles configurados alla y con los
  * que validan por rol tanto el BFF (SecurityConfig) como cada microservicio.
  */
-export type RolCampuslab = 'ADMIN' | 'TECNICO' | 'ESTUDIANTE' | 'DOCENTE' | 'AUDITOR';
+export type RolCampuslab = 'ADMIN' | 'TECNICO' | 'ESTUDIANTE' | 'AUDITOR';
 
 /**
  * Punto unico de lectura de sesion/roles para toda la app: evita que cada

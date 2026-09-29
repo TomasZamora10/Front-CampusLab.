@@ -19,7 +19,7 @@ export class Dashboard implements OnInit {
   protected readonly cargandoKpis = signal(false);
 
   ngOnInit(): void {
-    if (this.auth.tieneAlgunRol('ADMIN', 'AUDITOR')) {
+    if (this.auth.tieneAlgunRol('ADMIN')) {
       this.cargandoKpis.set(true);
       this.reportService.kpis().subscribe({
         next: (kpis) => {
